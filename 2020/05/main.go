@@ -10,7 +10,7 @@ import (
 )
 
 func main() {
-	lines, err := readLines("./05/input.txt")
+	lines, err := readLines("./2020/05/input.txt")
 	if err != nil {
 		log.Fatalf("readLines: %s", err)
 	}

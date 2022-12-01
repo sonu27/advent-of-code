@@ -10,7 +10,7 @@ import (
 )
 
 func main() {
-	b, _ := ioutil.ReadFile("./13/input.txt")
+	b, _ := ioutil.ReadFile("./2020/13/input.txt")
 	lines := strings.Split(string(b), "\n")
 	num := s2i(lines[0])
 	buses := strings.Split(lines[1], ",")

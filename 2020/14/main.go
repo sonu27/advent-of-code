@@ -13,7 +13,7 @@ var memory map[int64]string
 
 func main() {
 	memory = make(map[int64]string)
-	_ = readLines("./14/input.txt")
+	_ = readLines("./2020/14/input.txt")
 }
 
 func readLines(path string) error {

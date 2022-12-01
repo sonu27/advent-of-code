@@ -9,7 +9,7 @@ import (
 var lines [][]string
 
 func main() {
-	lines, _ = readLines("./03/input.txt")
+	lines, _ = readLines("./2020/03/input.txt")
 
 	work := [][]int{{1, 1}, {3, 1}, {5, 1}, {7, 1}, {1, 2}}
 	count := 1

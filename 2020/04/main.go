@@ -12,7 +12,7 @@ import (
 var lines []map[string]string
 
 func main() {
-	lines, _ = readLines("./04/input.txt")
+	lines, _ = readLines("./2020/04/input.txt")
 
 	count := 0
 	for _, v := range lines {

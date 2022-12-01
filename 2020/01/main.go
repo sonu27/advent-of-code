@@ -9,7 +9,7 @@ import (
 )
 
 func main() {
-	lines, err := readLines("./01/input.txt")
+	lines, err := readLines("./2020/01/input.txt")
 	if err != nil {
 		log.Fatalf("readLines: %s", err)
 	}
@@ -34,7 +34,7 @@ func part2(lines []int) {
 		for j := i + 1; j < len(lines)-1; j++ {
 			for k := j + 1; k < len(lines); k++ {
 				if lines[i]+lines[j]+lines[k] == 2020 {
-					fmt.Println(lines[i] * lines[j] * + lines[k])
+					fmt.Println(lines[i] * lines[j] * +lines[k])
 					return
 				}
 			}
