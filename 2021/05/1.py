@@ -7,9 +7,7 @@ for line in data:
     maxX = max(maxX, line[0][0], line[1][0])
     maxY = max(maxY, line[0][1], line[1][1])
 
-grid = []
-for _ in range(0, maxY+1):
-    grid.append([0] * (maxX + 1))
+grid = [[0 for _ in range(maxX + 1)] for _ in range(maxY + 1)]
 
 for line in data:
     x1, y1 = line[0]
