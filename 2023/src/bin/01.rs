@@ -1,13 +1,9 @@
+advent_of_code::solution!(1);
+
 use regex::Regex;
 
-fn main() {
-    let input = include_str!("input.txt");
-    println!("Part 1: {}", part1(input));
-    println!("Part 2: {}", part2(input));
-}
-
-fn part1(input: &str) -> u32 {
-    input
+pub fn part_one(input: &str) -> Option<u32> {
+    let a = input
         .lines()
         .filter_map(|line| {
             let first_digit = line.chars().find(|c| c.is_digit(10));
@@ -18,10 +14,11 @@ fn part1(input: &str) -> u32 {
             }
         })
         .map(|s| s.parse::<u32>().unwrap())
-        .sum()
+        .sum();
+    Some(a)
 }
 
-fn part2(input: &str) -> u32 {
+pub fn part_two(input: &str) -> Option<u32> {
     let re = Regex::new(r"(\d|one|two|three|four|five|six|seven|eight|nine)").unwrap();
     let word_to_num = [
         ("one", "1"),
@@ -38,7 +35,7 @@ fn part2(input: &str) -> u32 {
         .cloned()
         .collect::<std::collections::HashMap<_, _>>();
 
-    input
+    let a = input
         .lines()
         .filter_map(|line| {
             let mut matches = Vec::new();
@@ -58,5 +55,23 @@ fn part2(input: &str) -> u32 {
             }
         })
         .map(|s| s.parse::<u32>().unwrap())
-        .sum()
+        .sum();
+    Some(a)
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_part_one() {
+        let result = part_one(&advent_of_code::template::read_file("examples", DAY));
+        assert_eq!(result, None);
+    }
+
+    #[test]
+    fn test_part_two() {
+        let result = part_two(&advent_of_code::template::read_file("examples", DAY));
+        assert_eq!(result, None);
+    }
 }
