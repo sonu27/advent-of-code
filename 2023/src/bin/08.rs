@@ -4,9 +4,20 @@ use std::collections::HashMap;
 
 advent_of_code::solution!(8);
 
-pub fn part_one(input: &str) -> Option<u32> {
+fn parse_input(input: &str) -> (Vec<usize>, HashMap<String, Vec<String>>) {
     let mut lines = input.lines();
-    let cmds = lines.next().unwrap().chars();
+    let cmds: Vec<usize> = lines
+        .next()
+        .unwrap()
+        .chars()
+        .map(|c| match c {
+            'L' => 0,
+            'R' => 1,
+            _ => {
+                panic!("Invalid input")
+            }
+        })
+        .collect();
 
     lines.next(); // skip the blank line
 
@@ -21,10 +32,15 @@ pub fn part_one(input: &str) -> Option<u32> {
         .for_each(|v| {
             m.insert(
                 v.get(0).unwrap().clone(),
-                (v.get(1).unwrap().clone(), v.get(2).unwrap().clone()),
+                vec![v.get(1).unwrap().clone(), v.get(2).unwrap().clone()],
             );
         });
 
+    (cmds, m)
+}
+
+pub fn part_one(input: &str) -> Option<u32> {
+    let (cmds, m) = parse_input(input);
     let mut steps = 0;
     let mut curr = "AAA";
     loop {
@@ -32,44 +48,21 @@ pub fn part_one(input: &str) -> Option<u32> {
             if curr == "ZZZ" {
                 return Some(steps);
             }
-            let go = m.get(curr).unwrap();
-
-            if c == 'L' {
-                curr = &*go.0;
-            } else {
-                // R
-                curr = &*go.1;
-            }
-
+            curr = &m.get(curr).unwrap()[c];
             steps += 1;
         }
     }
 }
 
 pub fn part_two(input: &str) -> Option<u64> {
-    let mut lines = input.lines();
-    let cmds = lines.next().unwrap().chars();
+    let (cmds, m) = parse_input(input);
 
-    lines.next(); // skip the blank line
-
-    let mut m = HashMap::new();
     let mut currs = vec![];
-    let re = Regex::new(r"(\w+)").unwrap();
-    lines
-        .map(|line| {
-            re.captures_iter(line)
-                .map(|cap| cap[0].to_string())
-                .collect::<Vec<_>>()
-        })
-        .for_each(|v| {
-            let key = v.get(0).unwrap().clone();
-
-            if key.ends_with('A') {
-                currs.push(key.clone());
-            }
-
-            m.insert(key, (v.get(1).unwrap().clone(), v.get(2).unwrap().clone()));
-        });
+    m.iter().for_each(|(k, _)| {
+        if k.ends_with('A') {
+            currs.push(k.clone());
+        }
+    });
 
     let mut steps: u64 = 0;
     let mut step_counts = vec![0; currs.len()];
@@ -80,14 +73,7 @@ pub fn part_two(input: &str) -> Option<u64> {
                     continue;
                 }
 
-                let go = m.get(&currs[i]).unwrap();
-
-                if c == 'L' {
-                    currs[i] = (&*go.0).parse().unwrap();
-                } else {
-                    // R
-                    currs[i] = (&*go.1).parse().unwrap();
-                }
+                currs[i] = m.get(&currs[i]).unwrap()[c].parse().unwrap();
 
                 if currs[i].ends_with('Z') {
                     step_counts[i] = steps + 1;
