@@ -6,9 +6,7 @@ pub fn part_one(input: &str) -> Option<i64> {
         .map(|line| line.split_whitespace()
             .map(|s| s.parse::<i64>().unwrap())
             .collect::<Vec<_>>())
-        .map(|v| {
-            solve(v)
-        })
+        .map(|v| solve(v))
         .sum()
         ;
 
@@ -22,9 +20,7 @@ pub fn part_two(input: &str) -> Option<i64> {
             .map(|s| s.parse::<i64>().unwrap())
             .rev()
             .collect::<Vec<_>>())
-        .map(|v| {
-            solve(v)
-        })
+        .map(|v| solve(v))
         .sum()
         ;
 
@@ -32,29 +28,21 @@ pub fn part_two(input: &str) -> Option<i64> {
 }
 
 fn solve(a: Vec<i64>) -> i64 {
-    let mut nums: Vec<Vec<i64>> = vec![];
-    nums.push(a);
+    let mut nums: Vec<Vec<i64>> = vec![a];
 
-    loop {
-        for j in nums.len() - 1..nums.len() {
-            nums.push(vec![0; nums[j].len() - 1]);
-            for i in 0..nums[j].len() - 1 {
-                nums[j + 1][i] = nums[j][i + 1] - nums[j][i];
-            }
-        }
-        if nums[nums.len() - 1].iter().all(|&x| x == 0) {
-            break;
-        }
+    while !nums.last().unwrap().iter().all(|&x| x == 0) {
+        nums.push(nums
+            .last()
+            .unwrap()
+            .windows(2)
+            .map(|w| w[1] - w[0])
+            .collect::<Vec<_>>())
     }
 
-    for j in (0..nums.len() - 1).rev() {
-        let last = nums[j].last().unwrap().clone();
-        let last2 = nums[j + 1].last().unwrap().clone();
-
-        nums[j].push(last + last2);
-    }
-
-    nums[0].last().unwrap().clone()
+    nums
+        .iter()
+        .map(|v| v.last().unwrap())
+        .sum()
 }
 
 #[cfg(test)]
