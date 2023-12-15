@@ -1,9 +1,8 @@
-use std::cmp::max;
 advent_of_code::solution!(10);
 
 pub fn part_one(input: &str) -> Option<u32> {
     let mut start: [usize; 2] = [0, 0];
-    let map: Vec<_> = input
+    let mut map: Vec<_> = input
         .lines()
         .enumerate()
         .map(|(y, line)| {
@@ -36,65 +35,82 @@ pub fn part_one(input: &str) -> Option<u32> {
         })
         .collect();
 
-    print_char_map(&map.clone());
+    let mut visited: Vec<Vec<bool>> = vec![vec![false; map[0].len()]; map.len()];
+    let mut path: Vec<[usize; 2]> = Vec::new();
 
-    let mut int_map: Vec<Vec<u32>> = vec![vec![0; map[0].len()]; map.len()];
-    let ans = visit(&map, &mut int_map, start, 1);
+    visit(&mut map, &mut visited, start, &mut path);
 
-    Some(ans / 2)
+    // Shoelace formula
+    let mut trailing: i32 = 0;
+
+    for i in 0..path.len() {
+        let j = (i + 1) % path.len();
+        trailing += path[i][0] as i32 * path[j][1] as i32 - path[j][0] as i32 * path[i][1] as i32;
+    }
+
+    let area = (trailing as f32 / 2.0).abs();
+
+    // Pick's theorem
+    let inner_points = area - path.len() as f32 / 2.0 + 1.0;
+    println!("Part 2: {}", inner_points);
+
+    Some(path.len() as u32 / 2)
 }
 
 const STEPS: [(i32, i32); 4] = [(0, 1), (0, -1), (1, 0), (-1, 0)];
 
-fn visit(map: &Vec<Vec<char>>, int_map: &mut Vec<Vec<u32>>, pos: [usize; 2], count: u32) -> u32 {
+fn visit(
+    map: &mut Vec<Vec<char>>,
+    visited: &mut Vec<Vec<bool>>,
+    pos: [usize; 2],
+    path: &mut Vec<[usize; 2]>,
+) {
     let curr_char = map[pos[0]][pos[1]];
     for step in STEPS.iter() {
         let y = pos[0] as i32 + step.0;
         let x = pos[1] as i32 + step.1;
 
+        // check bounds
         if y < 0 || x < 0 || y >= map.len() as i32 || x >= map[y as usize].len() as i32 {
             continue;
         }
 
-        if map[y as usize][x as usize] == '0' || int_map[y as usize][x as usize] != 0 {
+        if visited[y as usize][x as usize] {
             continue;
         }
 
         match (curr_char, step.0, step.1) {
-            ('│', 0, _) => continue,
-            ('─', _, 0) => continue,
-            ('└', 1, _) => continue,
-            ('└', _, -1) => continue,
-            ('┘', 1, _) => continue,
-            ('┘', _, 1) => continue,
-            ('┐', -1, _) => continue,
-            ('┐', _, 1) => continue,
-            ('┌', -1, _) => continue,
-            ('┌', _, -1) => continue,
-            ('.', _, _) => continue,
+            ('│', 0, _)
+            | ('─', _, 0)
+            | ('└', 1, _)
+            | ('└', _, -1)
+            | ('┘', 1, _)
+            | ('┘', _, 1)
+            | ('┐', -1, _)
+            | ('┐', _, 1)
+            | ('┌', -1, _)
+            | ('┌', _, -1)
+            | ('0', _, _) => continue,
             _ => {}
         }
 
-        int_map[y as usize][x as usize] = count;
+        path.push([y as usize, x as usize]);
 
-        return max(
-            count,
-            visit(map, int_map, [y as usize, x as usize], count + 1),
-        );
+        map[pos[0]][pos[1]] = match map[pos[0]][pos[1]] {
+            '┌' => '┏',
+            '└' => '┗',
+            '┘' => '┛',
+            '┐' => '┓',
+            '│' => '┃',
+            '─' => '━',
+            _ => map[pos[0]][pos[1]],
+        };
+
+        visited[y as usize][x as usize] = true;
+
+        return visit(map, visited, [y as usize, x as usize], path);
     }
-
-    // map[pos[0]][pos[1]] = match map[pos[0]][pos[1]] {
-    //     '┌' => '┏',
-    //     '└' => '┗',
-    //     '┘' => '┛',
-    //     '┐' => '┓',
-    //     '│' => '┃',
-    //     '─' => '━',
-    //     _ => map[pos[0]][pos[1]],
-    // };
-    // print_char_map(&map);
-
-    count
+    print_char_map(&map);
 }
 
 fn print_map(map: &mut Vec<Vec<u32>>) {
@@ -122,7 +138,7 @@ fn print_char_map(map: &Vec<Vec<char>>) {
     // print!("{esc}[2J{esc}[1;1H", esc = 27 as char);
 }
 
-pub fn part_two(input: &str) -> Option<u32> {
+pub fn part_two(_: &str) -> Option<u32> {
     None
 }
 
@@ -133,7 +149,7 @@ mod tests {
     #[test]
     fn test_part_one() {
         let result = part_one(&advent_of_code::template::read_file("examples", DAY));
-        assert_eq!(result, None);
+        assert_eq!(result, Some(8));
     }
 
     // #[test]
