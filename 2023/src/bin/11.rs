@@ -1,68 +1,67 @@
-use std::collections::HashMap;
-
 advent_of_code::solution!(11);
 
-pub fn part_one(input: &str) -> Option<u32> {
+pub fn part_one(input: &str) -> Option<i64> {
+    Some(solve(input, 1))
+}
+
+pub fn part_two(input: &str) -> Option<i64> {
+    Some(solve(input, 999999))
+}
+
+fn solve(input: &str, expand: i64) -> i64 {
     let mut grid: Vec<Vec<char>> = Vec::new();
-    let mut cols_count = HashMap::new();
     let mut galaxy = Vec::new();
 
-    input.lines().for_each(|line| {
-        let mut row = 0;
+    let mut col_contains_galaxy = vec![false; input.lines().next().unwrap().len()];
+    let mut y_map = vec![0; input.lines().count()];
+
+    input.lines().enumerate().for_each(|(y, line)| {
+        if !line.contains('#') {
+            y_map[y] = 1;
+        }
+
         let chars = line
             .chars()
             .enumerate()
-            .map(|(i, c)| {
+            .map(|(x, c)| {
                 if c == '#' {
-                    row += 1;
-                    cols_count.insert(i, cols_count.get(&i).unwrap_or(&0) + 1);
+                    col_contains_galaxy[x] = true;
+                    galaxy.push((y, x));
                 }
                 c
             })
             .collect::<Vec<_>>();
 
-        if row == 0 {
-            grid.push(chars.clone());
-        }
         grid.push(chars);
     });
 
-    let new_grid: Vec<Vec<char>> = grid
-        .iter()
-        .map(|row| {
-            let mut new_row: Vec<char> = Vec::new();
-            row.iter().enumerate().for_each(|(i, c)| {
-                if cols_count.get(&i).is_none() {
-                    new_row.push(*c)
+    // pairs
+    let mut ans = 0;
+    for i in 0..galaxy.len() - 1 {
+        for j in i + 1..galaxy.len() {
+            let mut yy = [galaxy[i].0, galaxy[j].0];
+            yy.sort();
+
+            for y in yy[0]..yy[1] {
+                if y_map[y] == 1 {
+                    ans += expand;
                 }
+                ans += 1;
+            }
 
-                new_row.push(*c);
-            });
-            new_row
-        })
-        .collect();
+            let mut xx = [galaxy[i].1, galaxy[j].1];
+            xx.sort();
 
-    for (y, row) in new_grid.iter().enumerate() {
-        for (x, c) in row.iter().enumerate() {
-            if *c == '#' {
-                galaxy.push((y, x));
+            for x in xx[0]..xx[1] {
+                if !col_contains_galaxy[x] {
+                    ans += expand;
+                }
+                ans += 1;
             }
         }
     }
 
-    let mut a = 0;
-    for i in 0..galaxy.len() - 1 {
-        for j in i + 1..galaxy.len() {
-            a += (galaxy[j].0 - galaxy[i].0) as i32
-                + (galaxy[i].1 as i32 - galaxy[j].1 as i32).abs();
-        }
-    }
-
-    Some(a as u32)
-}
-
-pub fn part_two(input: &str) -> Option<u32> {
-    None
+    ans
 }
 
 #[cfg(test)]
