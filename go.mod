@@ -1,3 +1,3 @@
-module github.com/sonu27/advent-of-code
+module aoc
 
-go 1.19
+go 1.23
