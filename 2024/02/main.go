@@ -20,7 +20,7 @@ func main() {
 
 	scanner := bufio.NewScanner(file)
 	for scanner.Scan() {
-		a := lib.StringToIntSlice(scanner.Text())
+		a := lib.StringToIntSlice(scanner.Text(), " ")
 
 		if check(a) {
 			p1++

@@ -1,10 +1,10 @@
 package main
 
 import (
+	"aoc/lib"
 	"fmt"
 	"os"
 	"slices"
-	"strconv"
 	"strings"
 )
 
@@ -41,13 +41,7 @@ func main() {
 		var l, r int
 		_, err := fmt.Sscanf(v, "%d|%d", &l, &r)
 		if err != nil {
-			s := strings.Split(v, ",")
-			var n []int
-			for _, v := range s {
-				i, _ := strconv.Atoi(v)
-				n = append(n, i)
-
-			}
+			n := lib.StringToIntSlice(v, ",")
 
 			if slices.IsSortedFunc(n, mySort) {
 				p1 += n[len(n)/2]
